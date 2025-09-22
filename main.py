@@ -1,23 +1,60 @@
 import telebot
 import requests
-import json
-import time
-import os
 from config import TOKEN
+from telebot import types
 
-bot = telebot.TeleBot('TOKEN') #Токен
-
-
+bot = telebot.TeleBot(TOKEN) #Токен
 @bot.message_handler(commands=['start'])
 def start_message(message):
-    bot.send_message(message.chat.id, 'Привет!')
+    markup = types.InlineKeyboardMarkup()  # Создаем клавиатуру
+    item1 = types.InlineKeyboardButton("Как пользоваться данным ботом", callback_data='button_pressed')  # Создаем кнопку
+    markup.add(item1)  # Добавляем кнопку в клавиатуру
 
+    bot.send_message(message.chat.id, 'Привет, это HH хендлер!', reply_markup=markup)
+@bot.callback_query_handler(func=lambda call: True)
+def callback_inline(call):
+    if call.data == 'button_pressed':
+        bot.answer_callback_query(callback_query_id=call.id)
+        bot.send_message(call.message.chat.id, 'Чтобы получить список вакансий, вы должно написать команду /search вакансия которая вас интересует!')
 
-@bot.message_handler(commands=['info'])
-def info_message(message):
-    bot.send_message(message.chat.id,
-                     'Этот бот предназначен для того, чтобы найти подходящие вакансии по твоей специальности и опыту работы')
+# Хранение юзера]
+USER_STATES = {}
+@bot.message_handler(commands=['profile'])
+def profile_message(message):
+    USER_STATES[message.chat.id] = {'state': 'waiting_city'}
+    bot.send_message(message.chat.id, "Выбери свой город из списка:\n1. Москва\n2. Санкт-Петербург")
 
+@bot.message_handler(content_types=['text'])
+def handle_text(message):
+    state = USER_STATES.get(message.chat.id, {})
+
+    if state.get('state') == 'waiting_city':
+        if message.text.strip() == '1':
+            USER_STATES[message.chat.id] = {'state': 'waiting_keyword', 'city': 1}  # Москва
+            bot.send_message(message.chat.id, "Отлично! Теперь укажите ключевое слово для поиска вакансий.")
+        elif message.text.strip() == '2':
+            USER_STATES[message.chat.id] = {'state': 'waiting_keyword', 'city': 2}  # СПб
+            bot.send_message(message.chat.id, "Отлично! Теперь укажите ключевое слово для поиска вакансий.")
+        else:
+            bot.send_message(message.chat.id, "Пожалуйста, введите 1 или 2.")
+
+    elif state.get('state') == 'waiting_keyword':
+        keyword = message.text.strip()
+        area = state.get('city', 1)
+        vacancies = get_vacancies(keyword, area)
+
+        if not vacancies:
+            bot.send_message(message.chat.id, 'Вакансий по вашему запросу не найдено.')
+            return
+
+        for vacancy in vacancies:
+            bot.send_message(
+                message.chat.id,
+                f"📌 {vacancy['title']}\n"
+                f"🏢 {vacancy['company']}\n"
+                f"🔗 {vacancy['url']}\n"
+                f"💼 {vacancy['description']}"
+            )
 
 @bot.message_handler(commands=['search'])
 def search_message(message):
@@ -41,13 +78,12 @@ def search_message(message):
             f"💼 {vacancy['description']}"
         )
 
-
-def get_vacancies(keyword):
+def get_vacancies(keyword, area):
     url = "https://api.hh.ru/vacancies"
     params = {
         "text": keyword,
-        "area": 1,  # Айди area, для примера сейчас только Москва
-        "per_page": 10,  # Number of vacancies per page
+        "area": area,  # Айди area, для примера сейчас только Москва и Спб
+        "per_page": 10,  # Число вакансий на страничке
     }
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
