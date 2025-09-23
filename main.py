@@ -7,15 +7,15 @@ bot = telebot.TeleBot(TOKEN) #Токен
 @bot.message_handler(commands=['start'])
 def start_message(message):
     markup = types.InlineKeyboardMarkup()  # Создаем клавиатуру
-    item1 = types.InlineKeyboardButton("Как пользоваться данным ботом", callback_data='button_pressed')  # Создаем кнопку
-    markup.add(item1)  # Добавляем кнопку в клавиатуру
+    item1 = types.InlineKeyboardButton("Как пользоваться данным ботом", callback_data='button_pressed')
+    markup.add(item1)
 
     bot.send_message(message.chat.id, 'Привет, это HH хендлер!', reply_markup=markup)
 @bot.callback_query_handler(func=lambda call: True)
 def callback_inline(call):
     if call.data == 'button_pressed':
         bot.answer_callback_query(callback_query_id=call.id)
-        bot.send_message(call.message.chat.id, 'Чтобы получить список вакансий, вы должно написать команду /search вакансия которая вас интересует!')
+        bot.send_message(call.message.chat.id, 'Чтобы получить список вакансий, вы должно написать команду /profile')
 
 # Хранение юзера]
 USER_STATES = {}
@@ -31,17 +31,34 @@ def handle_text(message):
     if state.get('state') == 'waiting_city':
         if message.text.strip() == '1':
             USER_STATES[message.chat.id] = {'state': 'waiting_keyword', 'city': 1}  # Москва
-            bot.send_message(message.chat.id, "Отлично! Теперь укажите ключевое слово для поиска вакансий.")
+            bot.send_message(message.chat.id, "Теперь укажите ключевое слово для поиска вакансий.")
         elif message.text.strip() == '2':
             USER_STATES[message.chat.id] = {'state': 'waiting_keyword', 'city': 2}  # СПб
-            bot.send_message(message.chat.id, "Отлично! Теперь укажите ключевое слово для поиска вакансий.")
+            bot.send_message(message.chat.id, "Теперь укажите ключевое слово для поиска вакансий.")
         else:
             bot.send_message(message.chat.id, "Пожалуйста, введите 1 или 2.")
 
     elif state.get('state') == 'waiting_keyword':
         keyword = message.text.strip()
         area = state.get('city', 1)
-        vacancies = get_vacancies(keyword, area)
+        USER_STATES[message.chat.id] = {
+            'state': 'waiting_experience',
+            'city': state['city'],
+            'keyword': keyword
+        }
+        bot.send_message(message.chat.id,"Укажите ваш опыт работы из списка:/1. Без опыта\n""2. 1–3 года\n""3. 3–6 лет\n""4. Более 6 лет")
+    elif state.get('state') == 'waiting_experience':
+        exp_map = {
+            '1': 'noExperience',
+            '2': 'between1And3',
+            '3': 'between3And6',
+            '4': 'moreThan6'
+        }
+        exp_choice = exp_map.get(message.text.strip())
+        city = state['city']
+        keyword = state['keyword']
+
+        vacancies = get_vacancies(keyword, city, exp_choice)
 
         if not vacancies:
             bot.send_message(message.chat.id, 'Вакансий по вашему запросу не найдено.')
@@ -78,12 +95,13 @@ def search_message(message):
             f"💼 {vacancy['description']}"
         )
 
-def get_vacancies(keyword, area):
+def get_vacancies(keyword, area, experience):
     url = "https://api.hh.ru/vacancies"
     params = {
         "text": keyword,
         "area": area,  # Айди area, для примера сейчас только Москва и Спб
-        "per_page": 10,  # Число вакансий на страничке
+        "per_page": 10, #Количество страничек которые отображаем
+        "experience": experience #Опыт разумеется
     }
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
