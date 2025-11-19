@@ -23,7 +23,7 @@ It was originally written just for fun, and the bot can be improved further — 
 
 3.Create a config.py file and add your BotFather token, which you can obtain by finding BotFather in Telegram:
   ```bash
-  TOKEN = "твой_telegram_токен"
+  TOKEN = "your_telegram_token"
  ```
 4.Run the bot:
    ```bash
