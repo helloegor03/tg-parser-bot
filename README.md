@@ -1,31 +1,31 @@
-# 🤖 HH Хендлер — Telegram-бот для поиска вакансий
+# 🤖 HH Handler — Telegram Bot for Job Search
 
-Этот проект — Telegram-бот для поиска вакансий через API [HeadHunter](https://api.hh.ru/).  
-Написан был просто для развлечения и бота можно доработать и добавить функционал по типу отображения поста по одному и переключение с помощью кнопок и добавить дополнительной фильтрации
+This project is a Telegram bot for searching job vacancies using the HeadHunter API.
+It was originally written just for fun, and the bot can be improved further — for example, by adding features like viewing vacancies one by one with navigation buttons, or adding additional filtering.
 
-## 🚀 Функционал на данный момент 
-- 📍 Выбор города (Москва или Санкт-Петербург)  
-- 🔎 Поиск вакансий по ключевому слову  
-- 💼 Фильтрация по опыту работы:
-  - Без опыта
-  - 1–3 года
-  - 3–6 лет
-  - Более 6 лет
+## 🚀 Current Functionality 
+- 📍 City selection (Moscow or Saint Petersburg)
+- 🔎 Job search by keyword  
+- 💼 Experience filtering:
+  - No experience
+  - 1–3 years
+  - 3–6 years
+  - More than 6 years
  
-## ⚙️ Установка и запуск
+## ⚙️ Installation and Launch
 
-1. Клонируй репозиторий:
+1. Clone the repository:
    ```bash
    git clone https://github.com/helloegor03/tg-parser-bot.git
    cd tg-parser-bot
    ```
-2. Создай виртуальное окружение и добавь зависимости
+2. Create a virtual environment and install dependencies
 
-3.Создай файл config.py и добавь в него свой токен от BotFather, который ты можешь получить найдя данного бота в Телеграм
+3.Create a config.py file and add your BotFather token, which you can obtain by finding BotFather in Telegram:
   ```bash
   TOKEN = "твой_telegram_токен"
  ```
-4.Запусти бота
+4.Run the bot:
    ```bash
   python main.py
   ```
