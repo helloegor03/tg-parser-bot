@@ -1,31 +1,53 @@
-# 🤖 HH Handler — Telegram Bot for Job Search
+# 🤖 HH Handler Bot v2
 
-This project is a Telegram bot for searching job vacancies using the HeadHunter API.
-It was originally written just for fun, and the bot can be improved further — for example, by adding features like viewing vacancies one by one with navigation buttons, or adding additional filtering.
+Telegram-бот для поиска вакансий на HeadHunter — переписан с нуля.
 
-## 🚀 Current Functionality 
-- 📍 City selection (Moscow or Saint Petersburg)
-- 🔎 Job search by keyword  
-- 💼 Experience filtering:
-  - No experience
-  - 1–3 years
-  - 3–6 years
-  - More than 6 years
- 
-## ⚙️ Installation and Launch
+## Структура
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/helloegor03/tg-parser-bot.git
-   cd tg-parser-bot
-   ```
-2. Create a virtual environment and install dependencies
+```
+hh_bot/
+├── bot.py           # Точка входа, все хэндлеры
+├── hh_api.py        # Клиент HH API (сессия, кэш, нормализация)
+├── db.py            # SQLite: состояния, избранное, подписки, кэш
+├── keyboards.py     # Все inline-клавиатуры
+├── utils.py         # format_salary, strip_html, format_date
+├── scheduler.py     # Фоновая проверка подписок
+├── config.py        # Настройки
+└── requirements.txt
+```
 
-3.Create a config.py file and add your BotFather token, which you can obtain by finding BotFather in Telegram:
-  ```bash
-  TOKEN = "your_telegram_token"
- ```
-4.Run the bot:
-   ```bash
-  python main.py
-  ```
+## Установка
+
+```bash
+git clone <repo>
+cd hh_bot
+pip install -r requirements.txt
+```
+
+Отредактируй `config.py` — вставь токен от @BotFather:
+```python
+TOKEN = "1234567890:AAxxxx..."
+```
+
+## Запуск
+
+```bash
+python bot.py
+```
+
+## Возможности
+
+| Фича | Описание |
+|------|----------|
+| 🔍 Поиск | Inline-кнопки: город, опыт, зарплата, занятость → ключевое слово |
+| 📄 Карточки | Пагинация ⬅️ ➡️, чистое форматирование, зарплатная вилка |
+| ⭐ Избранное | Сохраняй вакансии, просматривай список, удаляй |
+| 🔔 Подписки | Бот сам проверяет новые вакансии раз в час |
+| 💾 SQLite | Состояния переживают перезагрузку бота |
+| ⚡ Кэш | Повторные запросы не идут в API (30 мин) |
+| 🛡 Rate limit | Обработка 403, retry на 5xx, timeout |
+
+## HH API
+
+Публичный API не требует ключа для базовых запросов.  
+Документация: https://github.com/hhru/api
