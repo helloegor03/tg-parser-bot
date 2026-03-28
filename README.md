@@ -1,22 +1,22 @@
 # 🤖 HH Handler Bot v2
 
-Telegram-бот для поиска вакансий на HeadHunter — переписан с нуля.
+Telegram Bot for searching vacancies on HeadHunter has been rewritten from scratch.
 
-## Структура
+## Structure
 
 ```
 hh_bot/
-├── bot.py           # Точка входа, все хэндлеры
-├── hh_api.py        # Клиент HH API (сессия, кэш, нормализация)
-├── db.py            # SQLite: состояния, избранное, подписки, кэш
-├── keyboards.py     # Все inline-клавиатуры
+├── bot.py           # Entry point, all handlers
+├── hh_api.py        # HH API Client (session, cache, normalization)
+├── db.py            # SQLite: states, favorites, subscriptions, cache
+├── keyboards.py     # All inline keyboards
 ├── utils.py         # format_salary, strip_html, format_date
-├── scheduler.py     # Фоновая проверка подписок
-├── config.py        # Настройки
+├── scheduler.py     # Background subscription checking
+├── config.py        # Settings
 └── requirements.txt
 ```
 
-## Установка
+## Installation
 
 ```bash
 git clone <repo>
@@ -24,30 +24,30 @@ cd hh_bot
 pip install -r requirements.txt
 ```
 
-Отредактируй `config.py` — вставь токен от @BotFather:
+Edit `config.py` and insert the token from @BotFather:
 ```python
 TOKEN = "1234567890:AAxxxx..."
 ```
 
-## Запуск
+## Start
 
 ```bash
 python bot.py
 ```
 
-## Возможности
+## Possibilities
 
-| Фича | Описание |
+| Feature | Description |
 |------|----------|
-| 🔍 Поиск | Inline-кнопки: город, опыт, зарплата, занятость → ключевое слово |
-| 📄 Карточки | Пагинация ⬅️ ➡️, чистое форматирование, зарплатная вилка |
-| ⭐ Избранное | Сохраняй вакансии, просматривай список, удаляй |
-| 🔔 Подписки | Бот сам проверяет новые вакансии раз в час |
-| 💾 SQLite | Состояния переживают перезагрузку бота |
-| ⚡ Кэш | Повторные запросы не идут в API (30 мин) |
-| 🛡 Rate limit | Обработка 403, retry на 5xx, timeout |
+| 🔍 Search | Inline buttons: city, experience, salary, employment → keyword |
+| 📄 Cards | Pagination ⬅️ ➡️, clean formatting, salary range |
+| ⭐ Favorites | Save vacancies, view the list, delete |
+| 🔔 Subscriptions | The bot automatically checks for new vacancies once an hour. |
+| 💾 SQLite | States survive bot reboot |
+| ⚡ Cache | Repeated requests are not sent to the API (30 min) |
+| 🛡 Rate limit | Processing 403, retry at 5xx, timeout |
 
 ## HH API
 
-Публичный API не требует ключа для базовых запросов.  
-Документация: https://github.com/hhru/api
+The public API doesn't require a key for basic requests.
+Documentation: https://github.com/hhru/api
